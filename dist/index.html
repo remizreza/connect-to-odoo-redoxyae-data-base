@@ -2,9 +2,714 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Odoo Redoxyae Connector</title>
+  <style>
+    :root {
+      --primary: #714B67;
+      --primary-dark: #56394e;
+      --primary-light: #f5edf3;
+      --secondary: #00A09D;
+      --secondary-light: #e6f6f5;
+      --accent: #017E84;
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --surface-light: #334155;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
+      --border: #334155;
+      --success: #10B981;
+      --success-bg: rgba(16, 185, 129, 0.12);
+      --warning: #F59E0B;
+      --card-radius: 16px;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 60px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 24px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #714B67 0%, #00A09D 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(113, 75, 103, 0.35);
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--success-bg);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #34D399;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #10B981;
+      box-shadow: 0 0 8px #10B981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+
+    /* Grid layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-title svg {
+      color: var(--secondary);
+    }
+
+    /* Info Table */
+    .info-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+
+    .info-label {
+      color: var(--text-muted);
+    }
+
+    .info-value {
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #38BDF8;
+      word-break: break-all;
+    }
+
+    .info-value a {
+      color: #38BDF8;
+      text-decoration: none;
+    }
+    .info-value a:hover {
+      text-decoration: underline;
+    }
+
+    /* Steps */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.9rem;
+    }
+
+    .step-number {
+      background: var(--primary);
+      color: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-text strong {
+      color: #fff;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    input:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px rgba(0, 160, 157, 0.2);
+    }
+
+    /* Tabs */
+    .tab-header {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: var(--transition);
+    }
+
+    .tab-btn.active {
+      background: var(--surface-light);
+      color: #fff;
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: #fff;
+    }
+
+    /* Code Block */
+    .code-container {
+      position: relative;
+      background: #090D16;
+      border: 1px solid #1E293B;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: #E2E8F0;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(51, 65, 85, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #E2E8F0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      transition: var(--transition);
+    }
+
+    .copy-btn:hover {
+      background: var(--secondary);
+      color: #fff;
+    }
+
+    /* Model tags */
+    .model-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .model-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .model-chip:hover, .model-chip.active {
+      border-color: var(--secondary);
+      background: rgba(0, 160, 157, 0.15);
+      color: #38BDF8;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #10B981;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
-  <h1>Odoo Redoxyae Connector</h1>
+
+  <div class="container">
+    <header>
+      <div class="header-top">
+        <div class="logo-group">
+          <div class="logo-badge">O</div>
+          <div>
+            <h1>Odoo Redoxyae Connector</h1>
+            <p class="subtitle">Integration and API Hub for redoxyae database</p>
+          </div>
+        </div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Online &bull; Odoo 19.3 SaaS</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="grid grid-2">
+      <!-- Database Status Card -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3m-16 5c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3"/></svg>
+          Database Endpoint
+        </div>
+        <div class="info-list">
+          <div class="info-item">
+            <span class="info-label">Host URL</span>
+            <span class="info-value"><a href="https://redoxyae.odoo.com" target="_blank" rel="noopener">redoxyae.odoo.com</a></span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Database</span>
+            <span class="info-value">redoxyae</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Server Version</span>
+            <span class="info-value">saas~19.3+e (Enterprise)</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">XML-RPC Endpoint</span>
+            <span class="info-value">/xmlrpc/2/common & object</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">JSON-RPC Endpoint</span>
+            <span class="info-value">/jsonrpc</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Setup Guide -->
+      <div class="card">
+        <div class="card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+          Get Your Odoo API Key
+        </div>
+        <div class="step-list">
+          <div class="step-item">
+            <div class="step-number">1</div>
+            <div class="step-text">Sign in to <a href="https://redoxyae.odoo.com" target="_blank" style="color:#38BDF8">redoxyae.odoo.com</a>.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">2</div>
+            <div class="step-text">Tap your avatar (top right) &rarr; <strong>Preferences / My Profile</strong>.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">3</div>
+            <div class="step-text">Click the <strong>Account Security</strong> tab.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">4</div>
+            <div class="step-text">Under <strong>Developer API Keys</strong>, click <strong>New API Key</strong>.</div>
+          </div>
+          <div class="step-item">
+            <div class="step-number">5</div>
+            <div class="step-text">Enter your account password and copy the generated key.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Credentials Generator -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        Instant Code & Configuration Generator
+      </div>
+
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label for="inputEmail">Your Odoo Email / Login</label>
+          <input type="text" id="inputEmail" placeholder="e.g. user@redoxyae.com" value="">
+        </div>
+        <div class="form-group">
+          <label for="inputKey">Odoo API Key or Password</label>
+          <input type="password" id="inputKey" placeholder="Paste your API key here" value="">
+        </div>
+      </div>
+
+      <div class="tab-header">
+        <button class="tab-btn active" onclick="switchTab('cli')">CLI Command</button>
+        <button class="tab-btn" onclick="switchTab('env')">.env File</button>
+        <button class="tab-btn" onclick="switchTab('python')">Python (odoo_client.py)</button>
+        <button class="tab-btn" onclick="switchTab('node')">Node.js</button>
+        <button class="tab-btn" onclick="switchTab('curl')">cURL</button>
+      </div>
+
+      <div class="code-container">
+        <button class="copy-btn" onclick="copyCurrentCode()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+          <span id="copyBtnText">Copy</span>
+        </button>
+        <pre><code id="codeBlock"></code></pre>
+      </div>
+    </div>
+
+    <!-- Models Reference -->
+    <div class="card">
+      <div class="card-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        Key Odoo Models & Queries
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Tap a model to view typical query parameters and code:</p>
+
+      <div class="model-chips">
+        <div class="model-chip active" onclick="selectModel('res.partner')">res.partner (Contacts)</div>
+        <div class="model-chip" onclick="selectModel('sale.order')">sale.order (Sales)</div>
+        <div class="model-chip" onclick="selectModel('product.template')">product.template (Products)</div>
+        <div class="model-chip" onclick="selectModel('account.move')">account.move (Invoices)</div>
+        <div class="model-chip" onclick="selectModel('crm.lead')">crm.lead (Leads)</div>
+      </div>
+
+      <div class="code-container">
+        <pre><code id="modelSnippet"></code></pre>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Copied to clipboard!</div>
+
+  <script>
+    let currentTab = 'cli';
+    let currentModel = 'res.partner';
+
+    const emailInput = document.getElementById('inputEmail');
+    const keyInput = document.getElementById('inputKey');
+    const codeBlock = document.getElementById('codeBlock');
+    const modelSnippet = document.getElementById('modelSnippet');
+
+    const modelData = {
+      'res.partner': {
+        desc: 'Contacts, Customers, and Vendors',
+        fields: "['name', 'email', 'phone', 'city', 'country_id', 'is_company']",
+        domain: "[('is_company', '=', True)]",
+        example: `# Fetch company contacts
+contacts = client.search_read(
+    'res.partner',
+    domain=[('customer_rank', '>', 0)],
+    fields=['name', 'email', 'phone', 'city'],
+    limit=10,
+    order='name asc'
+)`
+      },
+      'sale.order': {
+        desc: 'Sales Quotations and Orders',
+        fields: "['name', 'partner_id', 'date_order', 'amount_total', 'state']",
+        domain: "[('state', 'in', ['sale', 'done'])]",
+        example: `# Fetch confirmed sales orders
+orders = client.search_read(
+    'sale.order',
+    domain=[('state', 'in', ['sale', 'done'])],
+    fields=['name', 'partner_id', 'amount_total', 'date_order'],
+    limit=10,
+    order='date_order desc'
+)`
+      },
+      'product.template': {
+        desc: 'Products & Service Catalog',
+        fields: "['name', 'list_price', 'standard_price', 'type', 'categ_id']",
+        domain: "[('sale_ok', '=', True)]",
+        example: `# Fetch salable products
+products = client.search_read(
+    'product.template',
+    domain=[('sale_ok', '=', True)],
+    fields=['name', 'list_price', 'type'],
+    limit=20
+)`
+      },
+      'account.move': {
+        desc: 'Customer Invoices & Vendor Bills',
+        fields: "['name', 'partner_id', 'move_type', 'state', 'amount_total', 'invoice_date']",
+        domain: "[('move_type', '=', 'out_invoice')]",
+        example: `# Fetch posted customer invoices
+invoices = client.search_read(
+    'account.move',
+    domain=[('move_type', '=', 'out_invoice'), ('state', '=', 'posted')],
+    fields=['name', 'partner_id', 'amount_total', 'invoice_date'],
+    limit=10
+)`
+      },
+      'crm.lead': {
+        desc: 'CRM Pipeline Leads and Opportunities',
+        fields: "['name', 'partner_id', 'contact_name', 'email_from', 'expected_revenue', 'stage_id']",
+        domain: "[('type', '=', 'opportunity')]",
+        example: `# Fetch open opportunities
+leads = client.search_read(
+    'crm.lead',
+    domain=[('type', '=', 'opportunity')],
+    fields=['name', 'expected_revenue', 'stage_id'],
+    limit=10
+)`
+      }
+    };
+
+    function updateCode() {
+      const user = emailInput.value.trim() || 'your-email@redoxyae.com';
+      const key = keyInput.value.trim() || 'YOUR_ODOO_API_KEY';
+
+      let code = '';
+      if (currentTab === 'cli') {
+        code = `# 1. Test and save credentials automatically into .env
+python3 test_connection.py --user "${user}" --key "${key}" --save
+
+# 2. Or run quickstart query
+python3 quickstart.py`;
+      } else if (currentTab === 'env') {
+        code = `# .env (git-ignored for security)
+ODOO_URL=https://redoxyae.odoo.com
+ODOO_DB=redoxyae
+ODOO_USER=${user}
+ODOO_API_KEY=${key}`;
+      } else if (currentTab === 'python') {
+        code = `from odoo_client import OdooClient
+
+client = OdooClient(
+    url="https://redoxyae.odoo.com",
+    db="redoxyae",
+    username="${user}",
+    password_or_key="${key}"
+)
+
+# Authenticate
+uid = client.authenticate()
+print(f"Connected! UID: {uid}")
+
+# Query contacts
+contacts = client.search_read(
+    "res.partner",
+    domain=[],
+    fields=["name", "email", "phone"],
+    limit=5
+)
+for c in contacts:
+    print(c["name"], c.get("email"))`;
+      } else if (currentTab === 'node') {
+        code = `const { OdooClient } = require('./odoo_client');
+
+async function run() {
+  const client = new OdooClient({
+    url: 'https://redoxyae.odoo.com',
+    db: 'redoxyae',
+    username: '${user}',
+    password: '${key}'
+  });
+
+  const uid = await client.authenticate();
+  console.log('Connected! UID:', uid);
+
+  const partners = await client.searchRead('res.partner', [], ['name', 'email'], 5);
+  console.log(partners);
+}
+
+run().catch(console.error);`;
+      } else if (currentTab === 'curl') {
+        code = `curl -X POST https://redoxyae.odoo.com/jsonrpc \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "call",
+    "params": {
+      "service": "common",
+      "method": "authenticate",
+      "args": ["redoxyae", "${user}", "${key}", {}]
+    },
+    "id": 1
+  }'`;
+      }
+
+      codeBlock.textContent = code;
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      updateCode();
+    }
+
+    function selectModel(modelName) {
+      currentModel = modelName;
+      document.querySelectorAll('.model-chip').forEach(c => {
+        c.classList.toggle('active', c.textContent.includes(modelName));
+      });
+      const data = modelData[modelName];
+      modelSnippet.textContent = `${data.example}\n\n# Common Fields:\n# ${data.fields}`;
+    }
+
+    function copyCurrentCode() {
+      const text = codeBlock.textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast();
+      });
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    emailInput.addEventListener('input', updateCode);
+    keyInput.addEventListener('input', updateCode);
+
+    // Initial render
+    updateCode();
+    selectModel('res.partner');
+  </script>
 </body>
 </html>
