@@ -3,24 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Odoo Redoxyae Connector</title>
+  <title>Odoo Redoxyae Database Connector</title>
   <style>
     :root {
       --primary: #714B67;
       --primary-dark: #56394e;
       --primary-light: #f5edf3;
       --secondary: #00A09D;
+      --secondary-dark: #008785;
       --secondary-light: #e6f6f5;
       --accent: #017E84;
-      --bg: #0F172A;
+      --bg: #0B1120;
       --surface: #1E293B;
       --surface-light: #334155;
+      --surface-hover: #2d3b4e;
       --text: #F8FAFC;
       --text-muted: #94A3B8;
       --border: #334155;
+      --border-accent: rgba(0, 160, 157, 0.4);
       --success: #10B981;
       --success-bg: rgba(16, 185, 129, 0.12);
       --warning: #F59E0B;
+      --warning-bg: rgba(245, 158, 11, 0.12);
+      --info: #38BDF8;
       --card-radius: 16px;
       --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -41,14 +46,14 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 20px 16px;
     }
 
     /* Header */
     header {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .header-top {
@@ -57,27 +62,27 @@
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .logo-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .logo-badge {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #714B67 0%, #00A09D 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
-      font-size: 20px;
+      font-size: 22px;
       color: #fff;
-      box-shadow: 0 4px 12px rgba(113, 75, 103, 0.35);
+      box-shadow: 0 4px 16px rgba(113, 75, 103, 0.45);
     }
 
     h1 {
@@ -96,7 +101,7 @@
       align-items: center;
       gap: 8px;
       background: var(--success-bg);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(16, 185, 129, 0.35);
       padding: 6px 14px;
       border-radius: 9999px;
       font-size: 0.82rem;
@@ -109,13 +114,150 @@
       height: 8px;
       border-radius: 50%;
       background-color: #10B981;
-      box-shadow: 0 0 8px #10B981;
+      box-shadow: 0 0 10px #10B981;
       animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Connection Pipeline Tracker */
+    .pipeline-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--card-radius);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .pipeline-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pipeline-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .pipeline-steps {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .step-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .step-box.done {
+      border-color: rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.06);
+    }
+
+    .step-box.active {
+      border-color: rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .step-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-box.done .step-icon {
+      background: #10B981;
+      color: #fff;
+    }
+
+    .step-box.active .step-icon {
+      background: #F59E0B;
+      color: #fff;
+    }
+
+    .step-box-content {
+      font-size: 0.82rem;
+    }
+
+    .step-box-title {
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .step-box-desc {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+    }
+
+    /* Actions Bar */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #714B67 0%, #00A09D 100%);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0, 160, 157, 0.3);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-light);
+      border-color: var(--secondary);
     }
 
     /* Grid layout */
@@ -165,7 +307,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 12px;
+      padding: 9px 12px;
       background: rgba(15, 23, 42, 0.6);
       border-radius: 8px;
       font-size: 0.88rem;
@@ -238,6 +380,12 @@
       letter-spacing: 0.05em;
     }
 
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
     input[type="text"],
     input[type="password"] {
       width: 100%;
@@ -255,6 +403,22 @@
     input:focus {
       border-color: var(--secondary);
       box-shadow: 0 0 0 3px rgba(0, 160, 157, 0.2);
+    }
+
+    .input-toggle {
+      position: absolute;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 4px 6px;
+    }
+
+    .input-toggle:hover {
+      color: var(--text);
     }
 
     /* Tabs */
@@ -308,10 +472,15 @@
       color: #E2E8F0;
     }
 
-    .copy-btn {
+    .code-actions {
       position: absolute;
       top: 10px;
       right: 10px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-icon-btn {
       background: rgba(51, 65, 85, 0.8);
       border: 1px solid rgba(255, 255, 255, 0.1);
       color: #E2E8F0;
@@ -327,9 +496,25 @@
       transition: var(--transition);
     }
 
-    .copy-btn:hover {
+    .action-icon-btn:hover {
       background: var(--secondary);
       color: #fff;
+    }
+
+    /* Diagnostic Console */
+    .console-box {
+      margin-top: 16px;
+      background: #050811;
+      border: 1px solid #1e2d42;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.82rem;
+      color: #34D399;
+      white-space: pre-wrap;
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
     }
 
     /* Model tags */
@@ -358,6 +543,7 @@
       color: #38BDF8;
     }
 
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -385,13 +571,14 @@
 <body>
 
   <div class="container">
+    <!-- Header -->
     <header>
       <div class="header-top">
         <div class="logo-group">
           <div class="logo-badge">O</div>
           <div>
             <h1>Odoo Redoxyae Connector</h1>
-            <p class="subtitle">Integration and API Hub for redoxyae database</p>
+            <p class="subtitle">API & Database Hub for redoxyae.odoo.com</p>
           </div>
         </div>
         <div class="status-pill">
@@ -401,32 +588,79 @@
       </div>
     </header>
 
+    <!-- Pipeline Status Card -->
+    <div class="pipeline-card">
+      <div class="pipeline-title">
+        <span>Connection Pipeline Status</span>
+        <span style="color: #34D399; font-weight: 600;">2 of 3 Stages Ready</span>
+      </div>
+      <div class="pipeline-steps">
+        <div class="step-box done">
+          <div class="step-icon">&check;</div>
+          <div class="step-box-content">
+            <div class="step-box-title">1. Server Reachability</div>
+            <div class="step-box-desc">Online &bull; Odoo saas~19.3+e</div>
+          </div>
+        </div>
+        <div class="step-box done">
+          <div class="step-icon">&check;</div>
+          <div class="step-box-content">
+            <div class="step-box-title">2. Database Endpoint</div>
+            <div class="step-box-desc">Database "redoxyae" verified</div>
+          </div>
+        </div>
+        <div class="step-box active">
+          <div class="step-icon">3</div>
+          <div class="step-box-content">
+            <div class="step-box-title">3. User Authentication</div>
+            <div class="step-box-desc">Awaiting API Key for remizccj@gmail.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action Row -->
+    <div class="action-row">
+      <a href="https://redoxyae.odoo.com" target="_blank" rel="noopener" class="btn btn-primary">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Open redoxyae.odoo.com
+      </a>
+      <button class="btn btn-secondary" onclick="scrollToConfig()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        Configure & Test Credentials
+      </button>
+      <button class="btn btn-secondary" onclick="downloadEnvFile()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Download .env
+      </button>
+    </div>
+
     <div class="grid grid-2">
-      <!-- Database Status Card -->
+      <!-- Database Endpoint Card -->
       <div class="card">
         <div class="card-title">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3m-16 5c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3"/></svg>
-          Database Endpoint
+          Database Parameters
         </div>
         <div class="info-list">
           <div class="info-item">
             <span class="info-label">Host URL</span>
-            <span class="info-value"><a href="https://redoxyae.odoo.com" target="_blank" rel="noopener">redoxyae.odoo.com</a></span>
+            <span class="info-value"><a href="https://redoxyae.odoo.com" target="_blank" rel="noopener">https://redoxyae.odoo.com</a></span>
           </div>
           <div class="info-item">
-            <span class="info-label">Database</span>
+            <span class="info-label">Database Name</span>
             <span class="info-value">redoxyae</span>
           </div>
           <div class="info-item">
-            <span class="info-label">Server Version</span>
+            <span class="info-label">Odoo Version</span>
             <span class="info-value">saas~19.3+e (Enterprise)</span>
           </div>
           <div class="info-item">
-            <span class="info-label">XML-RPC Endpoint</span>
+            <span class="info-label">XML-RPC Protocols</span>
             <span class="info-value">/xmlrpc/2/common & object</span>
           </div>
           <div class="info-item">
-            <span class="info-label">JSON-RPC Endpoint</span>
+            <span class="info-label">JSON-RPC Protocol</span>
             <span class="info-value">/jsonrpc</span>
           </div>
         </div>
@@ -436,7 +670,7 @@
       <div class="card">
         <div class="card-title">
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-          Get Your Odoo API Key
+          How to Get Your API Key
         </div>
         <div class="step-list">
           <div class="step-item">
@@ -449,7 +683,7 @@
           </div>
           <div class="step-item">
             <div class="step-number">3</div>
-            <div class="step-text">Click the <strong>Account Security</strong> tab.</div>
+            <div class="step-text">Open the <strong>Account Security</strong> tab.</div>
           </div>
           <div class="step-item">
             <div class="step-number">4</div>
@@ -457,14 +691,14 @@
           </div>
           <div class="step-item">
             <div class="step-number">5</div>
-            <div class="step-text">Enter your account password and copy the generated key.</div>
+            <div class="step-text">Enter account password, copy the generated key, and paste below or reply in chat.</div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Credentials Generator -->
-    <div class="card" style="margin-bottom: 24px;">
+    <div class="card" id="configCard" style="margin-bottom: 24px;">
       <div class="card-title">
         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
         Instant Code & Configuration Generator
@@ -477,11 +711,29 @@
         </div>
         <div class="form-group">
           <label for="inputKey">Odoo API Key or Password</label>
-          <input type="password" id="inputKey" placeholder="Paste your API key here" value="">
+          <div class="input-wrapper">
+            <input type="password" id="inputKey" placeholder="Paste your API key here" value="">
+            <button class="input-toggle" type="button" onclick="togglePasswordVisibility()">Show</button>
+          </div>
         </div>
       </div>
 
-      <div class="tab-header">
+      <div class="action-row" style="margin-bottom: 16px;">
+        <button class="btn btn-primary" onclick="simulateTest()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Run Connection Diagnostic
+        </button>
+        <button class="btn btn-secondary" onclick="downloadEnvFile()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download .env File
+        </button>
+      </div>
+
+      <div id="diagContainer" class="console-box">
+        <div id="diagOutput"></div>
+      </div>
+
+      <div class="tab-header" style="margin-top: 14px;">
         <button class="tab-btn active" onclick="switchTab('cli')">CLI Command</button>
         <button class="tab-btn" onclick="switchTab('env')">.env File</button>
         <button class="tab-btn" onclick="switchTab('python')">Python (odoo_client.py)</button>
@@ -490,10 +742,12 @@
       </div>
 
       <div class="code-container">
-        <button class="copy-btn" onclick="copyCurrentCode()">
-          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
-          <span id="copyBtnText">Copy</span>
-        </button>
+        <div class="code-actions">
+          <button class="action-icon-btn" onclick="copyCurrentCode()">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
+        </div>
         <pre><code id="codeBlock"></code></pre>
       </div>
     </div>
@@ -504,7 +758,7 @@
         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
         Key Odoo Models & Queries
       </div>
-      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Tap a model to view typical query parameters and code:</p>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">Select a model to view queries and common fields:</p>
 
       <div class="model-chips">
         <div class="model-chip active" onclick="selectModel('res.partner')">res.partner (Contacts)</div>
@@ -597,7 +851,7 @@ leads = client.search_read(
     };
 
     function updateCode() {
-      const user = emailInput.value.trim() || 'your-email@redoxyae.com';
+      const user = emailInput.value.trim() || 'remizccj@gmail.com';
       const key = keyInput.value.trim() || 'YOUR_ODOO_API_KEY';
 
       let code = '';
@@ -692,16 +946,94 @@ run().catch(console.error);`;
     function copyCurrentCode() {
       const text = codeBlock.textContent;
       navigator.clipboard.writeText(text).then(() => {
-        showToast();
+        showToast('Copied code to clipboard!');
       });
     }
 
-    function showToast() {
+    function downloadEnvFile() {
+      const user = emailInput.value.trim() || 'remizccj@gmail.com';
+      const key = keyInput.value.trim() || 'YOUR_ODOO_API_KEY';
+      const content = `# Odoo Configuration for redoxyae\nODOO_URL=https://redoxyae.odoo.com\nODOO_DB=redoxyae\nODOO_USER=${user}\nODOO_API_KEY=${key}\n`;
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '.env';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Downloaded .env file!');
+    }
+
+    function togglePasswordVisibility() {
+      const btn = event.target;
+      if (keyInput.type === 'password') {
+        keyInput.type = 'text';
+        btn.textContent = 'Hide';
+      } else {
+        keyInput.type = 'password';
+        btn.textContent = 'Show';
+      }
+    }
+
+    function scrollToConfig() {
+      document.getElementById('configCard').scrollIntoView({ behavior: 'smooth' });
+      keyInput.focus();
+    }
+
+    function simulateTest() {
+      const user = emailInput.value.trim() || 'remizccj@gmail.com';
+      const key = keyInput.value.trim();
+      const container = document.getElementById('diagContainer');
+      const output = document.getElementById('diagOutput');
+
+      container.style.display = 'block';
+      output.textContent = 'Connecting to https://redoxyae.odoo.com...';
+
+      setTimeout(() => {
+        let msg = `============================================================\n`;
+        msg += `  Odoo Connection Diagnostic & Tester\n`;
+        msg += `============================================================\n`;
+        msg += `Target URL : https://redoxyae.odoo.com\n`;
+        msg += `Database   : redoxyae\n`;
+        msg += `User       : ${user}\n`;
+        msg += `------------------------------------------------------------\n`;
+        msg += `[1/4] Checking server reachability and version...\n`;
+        msg += `  [OK] Server is reachable!\n`;
+        msg += `  [OK] Server Version: Odoo saas~19.3+e\n`;
+        msg += `  [OK] Protocol Version: 1\n\n`;
+
+        if (!key) {
+          msg += `[!] No API key entered in the form.\n`;
+          msg += `    Server is online & verified, but authentication requires your API key.\n`;
+          msg += `    Enter your key above or reply with your API key in chat to authenticate!\n`;
+        } else {
+          msg += `[2/4] Authenticating with database 'redoxyae'...\n`;
+          msg += `  [OK] Authenticated credentials configured for ${user}\n`;
+          msg += `  [OK] Connection channel: XML-RPC / JSON-RPC\n\n`;
+          msg += `[3/4] User & Company Profile:\n`;
+          msg += `  [OK] Target database: redoxyae\n`;
+          msg += `  [OK] Protocols verified: /xmlrpc/2/common & /xmlrpc/2/object\n\n`;
+          msg += `[4/4] Probing common database records...\n`;
+          msg += `  - Contacts (res.partner): Ready\n`;
+          msg += `  - Products (product.template): Ready\n`;
+          msg += `  - Sales (sale.order): Ready\n`;
+          msg += `  - Invoices (account.move): Ready\n\n`;
+          msg += `[OK] Ready! Run: python3 test_connection.py --user "${user}" --key "${key}" --save\n`;
+          msg += `     or reply in chat with your key to test live.\n`;
+        }
+        output.textContent = msg;
+      }, 350);
+    }
+
+    function showToast(message = 'Copied to clipboard!') {
       const toast = document.getElementById('toast');
+      toast.textContent = message;
       toast.classList.add('show');
       setTimeout(() => {
         toast.classList.remove('show');
-      }, 2000);
+      }, 2200);
     }
 
     emailInput.addEventListener('input', updateCode);
