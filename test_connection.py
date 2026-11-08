@@ -137,13 +137,19 @@ def main():
         action="store_true",
         help="Save credentials to .env for future use",
     )
+    parser.add_argument(
+        "--interactive",
+        "-i",
+        action="store_true",
+        help="Prompt interactively for credentials if not supplied",
+    )
+
     args = parser.parse_args()
 
     user = args.user
     key = args.key
 
-    # If running interactively in terminal without args or env vars, ask nicely
-    if sys.stdin.isatty() and not user:
+    if args.interactive and not user:
         try:
             prompt_user = input("Odoo User Email (leave blank to skip auth): ").strip()
             if prompt_user:
